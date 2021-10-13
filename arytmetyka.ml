@@ -47,14 +47,6 @@ let razy a b = {
 };;
 
 let podzielic a b = {
-  x_1 = 
-    if b.x_1 = 0. then 
-      infinity 
-    else 
-      a.x_1 /. b.x_1;
-  x_2 = 
-    if b.x_2 = 0. then 
-      infinity
-    else 
-      a.x_2 /. b.x_2;
+  x_1 = a.x_1 /. b.x_1;
+  x_2 = a.x_2 /. b.x_2;
 };;
