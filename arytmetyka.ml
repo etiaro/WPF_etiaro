@@ -10,7 +10,7 @@ let wartosc_dokladnosc x p = {
 
 let wartosc_od_do x y = {x_1 = x; x_2 = y};;
 
-let wartosc_dokladna x = (x, x);;
+let wartosc_dokladna x = {x_1 = x; x_2 = x};;
 
 
 (* funkcje *)
