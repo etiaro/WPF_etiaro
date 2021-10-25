@@ -32,11 +32,8 @@ let napraw (w:wartosc) =
 
   (* napraw_all przechodzi przez wszystkie przedziały zawarte w lista i 
   wywołuje na nich napraw_p, usuwa nieokreślone przedziały *)
-  in let rec napraw_all (lista:wartosc) res = 
-    match lista with
-      |[] -> (res:wartosc)
-      |h::t when (poprawny_p h) -> napraw_all t ((napraw_p h)::res)
-      |h::t -> napraw_all t res
+  in let rec napraw_all (lista:wartosc) = 
+    List.map napraw_p (List.filter poprawny_p lista)
       
   (* pom skleja przedziały nachodzące na siebie, 
   otrzymuje posortowaną po lower listę przedziałów w lista i aktualnie rozpatrywany przedział act *)
@@ -72,7 +69,7 @@ let napraw (w:wartosc) =
     
   (* sortujemy listę naprawioną przy użyciu napraw_all i przekazujemy ją do scal, 
   utworzoną listę przekazujemy do napraw0 *)
-  in match List.sort compare (napraw_all w []) with
+  in match List.sort compare (napraw_all w) with
     |h1::t1 -> napraw0 (scal t1 h1 []) []
     |[] -> ([]:wartosc);;
 
@@ -132,29 +129,17 @@ let wartosc_dokladna x = napraw [{
 let in_wartosc_p {lower; upper} x = 
   (x >= lower) && (x <= upper);;
 let rec in_wartosc (w:wartosc) x = 
-  match w with 
-    |[] -> false
-    |h::t -> in_wartosc_p h x || in_wartosc t x;;
+  List.fold_left (fun res p -> res || in_wartosc_p p x) false w;;
 
 let rec min_wartosc (w:wartosc) =
-  let rec pom res left =
-    match left with
-      |([]:wartosc) -> res
-      |h::[] -> min res h.lower
-      |h::t -> pom (min res h.lower) t
-  in match w with
+  match w with
     |([]:wartosc) -> nan
-    |h::t -> pom h.lower t
+    |v -> List.fold_left (fun res p -> min res p.lower) infinity v;;
 
 let rec max_wartosc (w:wartosc) = 
-  let rec pom res left =
-    match left with
-      |([]:wartosc) -> res
-      |h::[] -> max res h.upper
-      |h::t -> pom (max res h.upper) t
-  in match w with
+  match w with
     |([]:wartosc) -> nan
-    |h::t -> pom h.upper t
+    |v -> List.fold_left (fun res p -> max res p.upper) neg_infinity v;;
 
 let sr_wartosc (w:wartosc) = (min_wartosc w +. max_wartosc w) /. 2.;;
 
@@ -169,9 +154,5 @@ let razy a b = operacja a b ( *.);;
 
 
 let odwroc (w:wartosc) =
-  let rec pom res lista =
-    match lista with
-      |[] -> res
-      |h::t -> pom ({lower = 1./.h.lower; upper = 1./.h.upper}::res) t
-  in napraw (pom [] w);;
+  napraw (List.map (fun p -> {lower=1. /. p.lower; upper=1. /. p.upper}) w);;
 let podzielic a b = razy a (odwroc b);;
