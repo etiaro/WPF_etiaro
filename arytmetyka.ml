@@ -1,3 +1,7 @@
+(* Arytmetyka WPF *)
+(* Autor: Jakub Klimek *)
+(* Reviewer: Jan Szot *)
+
 type przedzial = {
   lower: float; 
   upper: float; 
