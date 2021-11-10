@@ -6,11 +6,11 @@ type 'a node =  {value:'a; left:'a queue; right:'a queue;len: int} and
  
     (* Funkcje pomocnicze *)
 let getLen = function
-  |Leaf -> 0
+  |Leaf -> 0 
   |Node n -> n.len;;
  
     (* funkcje ze specyfikacji *)
-let empty = Leaf;
+let empty = Leaf;;
 exception Empty;;
 let is_empty q1 = q1=empty;;
  
@@ -19,7 +19,7 @@ let rec join q1 q2 =
     if n1.value < n2.value then (n1,n2) else (n2,n1)
   in let sortPairByLen (q1, q2) =
     if getLen q1 < getLen q2 then (q1, q2) else (q2, q1)
-   
+
   in match q1 with
   |Leaf -> q2
   |Node n1 ->
