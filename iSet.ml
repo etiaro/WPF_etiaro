@@ -15,6 +15,21 @@ let size = function
   |Node(_,_,_,_,s)->s
   |Empty -> 0;;
 
+  (* JUST FOR DEBUGGING
+let max_diff = 2;;
+let check_balanced t =
+  let rec aux t = 
+    match t with
+    |Empty -> true
+    |Node(l, _, r, _, _) -> if 
+      abs ((height l) - (height r)) <= max_diff && 
+      aux l && 
+      aux r 
+    then true
+    else failwith ("Tree NOT BALANCED! diffrence:"^(string_of_int (abs ((height l) - (height r)))))
+  in let _ = aux t
+  in t;;
+  *)
 
 let empty = Empty;;
 
