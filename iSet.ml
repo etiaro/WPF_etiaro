@@ -13,11 +13,11 @@ let size = function
 
 let empty = Empty;;
 
+(*operacje dodawania i odejmowania z obsługiwaniem integer overflow*)
 let (++) a b =
   if a > 0 && b > 0 && a+b <= 0 then max_int
   else if a < 0 && b < 0 && a+b >= 0 then min_int
   else a+b;;
-
 let (--) a b =
   if a >= 0 && b < 0 && a-b <= 0 then max_int
   else if a < 0 && b > 0 && a-b >= 0 then min_int
@@ -25,7 +25,8 @@ let (--) a b =
 
 let is_empty t =
   t = Empty;;
-  (* balansuje drzewo *)
+  
+  (* balansuje drzewo(wywołuje sie rekurencyjnie tak dlugo az drzewo bedzie "ładne") *)
 let rec balance l k r =
   let hl = height l in
   let hr = height r in
@@ -51,7 +52,7 @@ let rec balance l k r =
     | Empty -> assert false
   else Node (l, k, r, max hl hr + 1, (size l) ++ (size r) ++ ((snd k) -- fst k ++ 1));;
 
-
+(* łączy dwa drzewa *)
 let rec merge t1 t2 = 
   match t1, t2 with
   |Empty,_ -> t2
@@ -100,36 +101,30 @@ let rec below x t =
     else below x l;;
 
 
-(* Funkcja zwracające pare - najmniejszy przedzial na s oraz s bez tego przedzialu *)
+(* zwraca najmniejszy przedzial w drzewie oraz drzewo bez niego *)
 let rec remove_min = function
   | Node (Empty, v, r, _, _) -> v,r
   | Node (l, k, r, _, _) -> let v,t = remove_min l
-    in v, balance (t) k r
+    in v, balance t k r
   | Empty -> invalid_arg "PSet.remove_min_elt";;
                           
-(* Funkcja zwracające pare - największy przedzial na s oraz s bez tego przedzialu *)
+(* zwraca największy przedzial w drzewie oraz drzewo bez przedzialu *)
 let rec remove_max =  function
   | Node (l, v, Empty, _, _) -> v,l
   | Node (l, k, r, _, _) -> let v,t = remove_max r
-    in v, balance l k (t)
+    in v, balance l k t
   | Empty -> invalid_arg "PSet.remove_min_elt";;
   
-let rec add (low,up) t =
-  if up < low then t else
-  let (l, _, tr) = split low t in
-    let (_, _, r) = split up tr in
-    let ((x, _), l) =
-        if l <> Empty && mem (low - 1) l then 
-            remove_max l
-        else 
-            ((low, up), l)
-    and ((_, y), r) =
-        if r <> Empty && mem (up + 1) r then 
-            remove_min r
-        else 
-            ((low, up), r) in
-    balance l (x, y) r
 
+let rec add (low,up) t =
+  let (l, _, _),(_, _, r) = (split low t, split up t)
+  in let ((x, _), lRes) =
+    if l = Empty || not (mem (low - 1) l) then ((low, up), l) 
+    else remove_max l(* jest przedział który kończy się na low-1, więc go usuwamy i włączamy do nowego przedziału *)
+  in let ((_, y), rRes) =
+    if r = Empty || not (mem (up + 1) r) then ((low, up), r)
+    else remove_min r   (* analogicznie *)
+  in balance lRes (x, y) rRes
 and split x t = 
   match t with
   |Empty -> (Empty, false, Empty)
