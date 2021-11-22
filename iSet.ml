@@ -1,3 +1,8 @@
+(* iSet *)
+(* Autor: Jakub Klimek *)
+(* Reviewer: Marcin Zolek *)
+
+
 type t = 
   |Empty
   |Node of t * (int * int) * t * int * int;;
