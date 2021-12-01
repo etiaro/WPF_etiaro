@@ -5,7 +5,7 @@
 (** Punkt na płaszczyźnie *)
 type point = float * float
 
-(** Poskładana kartka: ile razy kartkę przebije szpilka wbita w danym
+(** Poskładana kartka: funkcja zwracająca ile razy kartkę przebije szpilka wbita w danym
 punkcie *)
 type kartka = point -> int
 
@@ -25,8 +25,9 @@ let kolko (kx, ky) r = function
   |(x, y) -> 
       if sqrt((abs_float (kx -. x))**2. +. (abs_float (ky -. y))**2.) <= r then 1 else 0;;
 
-(* pozycja (p1,p2, p) zwraca -1 jezeli p jest po prawej od prostej p1-p2
-   0 jezeli na prostej i 1 jezeli jest po lewej TODO przerobic na jakiś typ Lewo/Prawo/Na*)
+(* [pozycja p1 p2 p] zwraca -1 jezeli p jest po prawej od prostej p1-p2
+   0 jezeli na prostej(traktując bardzo małe różnice jako błąd przybliżenia typu danych float) 
+   i 1 jezeli jest po lewej *)
 let pozycja (p1x, p1y) (p2x, p2y) (x, y) = 
   let det = p1x*.p2y+.p2x*.y+.x*.p1y-.p1x*.y-.p2x*.p1y-.x*.p2y
   in match det with
@@ -34,7 +35,7 @@ let pozycja (p1x, p1y) (p2x, p2y) (x, y) =
   |_ when det < 0. -> -1.
   |_ -> 1.;;
 
-(* zwraca symetrie punktu p wzgledem prostej p1-p2 *)
+(* [odbij p1 p2 p] zwraca symetrie punktu p wzgledem prostej p1-p2 *)
 let odbij (p1x, p1y) (p2x, p2y) (x, y) = 
   if p1x = p2x then
     (2.*.p1x-.x, y)
