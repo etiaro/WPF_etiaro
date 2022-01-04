@@ -24,7 +24,7 @@ let przelewanka arr =
     if Array.for_all (fun (x,y) -> y <> 0 && y <> x) arr then raise (Found (-1));
 
     let n = Array.length arr in
-    (* funkcje hashujące *)
+    (* funkcje hashujące - podwójne hashowanie: bardzo niska szansa na kolizję *)
     let pows = (Array.make n 1) in
     let pows2 = (Array.make n 1) in
     let p = ref 1 in
@@ -32,11 +32,16 @@ let przelewanka arr =
     for i = 0 to n-1 do
       pows.(i) <- !p;
       pows2.(i) <- !p2;
-      p:=!p*%x;
-      p2:=!p2*%%x;
+      p := !p *% x;
+      p2 := !p2 *%% x2;
     done;
-    let get_hash s = Array.fold_left (fun (i, v, v2) e -> (i+1,v +% (pows.(i) *% e), v2 +%% (pows2.(i) *%% e))) (0, 0, 0) s |> (fun (_,a,b)->a,b) in
-    let change_hash old pos dif = (fst old +% (pows.(pos) *% dif) +% m, snd old +%% (pows2.(pos) *%% dif) +%% m2) in
+    let get_hash s = Array.fold_left (fun (i, v, v2) e -> 
+      (i+1, 
+      v +% (pows.(i) *% e), 
+      v2 +%% (pows2.(i) *%% e))
+    ) (0, 0, 0) s |> (fun (_,a,b)->a,b) in
+    let change_hash old pos dif = (fst old +% (pows.(pos) *% dif) +% m, 
+      snd old +%% (pows2.(pos) *%% dif) +%% m2) in
 
     (*BFS po stanach*)
     let states = Hashtbl.create 4242424 in
