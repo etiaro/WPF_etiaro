@@ -1,3 +1,7 @@
+(* Przelewanka *)
+(* Author: Jakub Klimek *)
+(* Code review: Adam Greloch *)
+
 exception Found of int;;
 
 (* stałe i operacje arytmetyczne do hashowania *)
